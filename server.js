@@ -8,7 +8,11 @@ const PORT = process.env.PORT || 10000;
 
 // === Токены ===
 const TOKEN = process.env.TELEGRAM_TOKEN;
-const ADMIN_ID = process.env.ADMIN_ID; // Ваш Telegram ID
+// === Поддержка нескольких админов ===
+const ADMIN_IDS = (process.env.ADMIN_IDS || process.env.ADMIN_ID || '')
+  .split(',')
+  .map(id => id.trim())
+  .filter(Boolean);
 
 if (!TOKEN) throw new Error('Установите TELEGRAM_TOKEN');
 if (!ADMIN_ID) console.warn('⚠️ Не установлен ADMIN_ID — команды /nule и /com будут доступны всем');
@@ -95,7 +99,8 @@ bot.onText(/\/bal\s+(\w+)/, (msg, match) => {
 // === Команда: /json view ===
 bot.onText(/\/json\s+view/i, (msg) => {
   const chatId = msg.chat.id;
-  const isAdmin = String(msg.from.id) === ADMIN_ID;
+const userId = String(msg.from.id);
+const isAdmin = ADMIN_IDS.includes(userId);
 
   if (!isAdmin && ADMIN_ID) {
     bot.sendMessage(chatId, '❌ Доступ запрещён.');
