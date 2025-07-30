@@ -359,9 +359,9 @@ bot.on('message', (msg) => {
 
 // === API и веб-страница ===
 app.get('/api/players', (req, res) => {
+  res.set('Cache-Control', 'no-store'); // Отключаем кэширование
   res.json(players);
 });
-
 // === Страница /info ===
 app.get('/info', (req, res) => {
   res.send(`
