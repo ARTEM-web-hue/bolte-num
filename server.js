@@ -3,6 +3,7 @@ const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios'); // Добавлено для работы с GitHub API
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -16,24 +17,72 @@ const ADMIN_IDS = (process.env.ADMIN_IDS || process.env.ADMIN_ID || '')
   .map(id => id.trim())
   .filter(Boolean);
 
+// === GitHub Settings for Auto-Save ===
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Новый: PAT
+const GITHUB_REPO = process.env.GITHUB_REPO;   // Новый: username/repo, e.g., ARTEM-web-hue/bolte-num
+const GITHUB_FILE_PATH = process.env.GITHUB_FILE_PATH || 'players.json'; // Новый: путь в репо
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main'; // Новый: ветка
+
+let githubFileSha = null; // Будем хранить SHA последнего коммита файла
+
 if (!TOKEN) throw new Error('Установите TELEGRAM_TOKEN');
 // Исправлено: используем ADMIN_IDS.length
 if (ADMIN_IDS.length === 0) console.warn('⚠️ Не установлены ADMIN_IDS — команды будут доступны всем');
 
+// Проверка GitHub настроек
+if (GITHUB_TOKEN && GITHUB_REPO) {
+  console.log(`💾 Автосохранение в GitHub включено: ${GITHUB_REPO}/${GITHUB_FILE_PATH} (ветка: ${GITHUB_BRANCH})`);
+} else if (GITHUB_TOKEN || GITHUB_REPO) {
+  console.warn('⚠️ Для автосохранения в GitHub нужны обе переменные: GITHUB_TOKEN и GITHUB_REPO');
+}
+
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-// === Файл с данными ===
+// === Файл с данными (локально для быстрого доступа) ===
 const DATA_FILE = path.join(__dirname, 'players.json');
 
 // === Загрузка игроков ===
 let players = [];
-function loadPlayers() {
+async function loadPlayers() {
   try {
+    // 1. Попробуем загрузить с GitHub
+    if (GITHUB_TOKEN && GITHUB_REPO) {
+      console.log('🔄 Попытка загрузки players.json с GitHub...');
+      try {
+        const response = await axios.get(`https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`, {
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github.v3+json',
+          },
+          params: {
+            ref: GITHUB_BRANCH
+          }
+        });
+        const content = Buffer.from(response.data.content, 'base64').toString('utf8');
+        players = JSON.parse(content);
+        githubFileSha = response.data.sha; // Сохраняем SHA
+        console.log(`✅ Загружено ${players.length} игроков с GitHub (SHA: ${githubFileSha.substring(0, 7)})`);
+        // Также сохраняем локально для быстродействия
+        fs.writeFileSync(DATA_FILE, content, 'utf8');
+        return;
+      } catch (githubErr) {
+        if (githubErr.response && githubErr.response.status === 404) {
+          console.log('ℹ️ Файл players.json не найден на GitHub. Будет создан новый.');
+        } else {
+          console.error('❌ Ошибка загрузки с GitHub:', githubErr.response?.data || githubErr.message);
+        }
+      }
+    }
+
+    // 2. Если GitHub недоступен или файл не найден, пробуем локальный файл
     if (fs.existsSync(DATA_FILE)) {
+      console.log('🔄 Загрузка players.json с локального диска...');
       const data = fs.readFileSync(DATA_FILE, 'utf8');
       players = JSON.parse(data);
-      console.log(`✅ Загружено ${players.length} игроков`);
+      console.log(`✅ Загружено ${players.length} игроков с локального диска`);
     } else {
+      // 3. Если и локального файла нет, используем начальные данные
+      console.log('🆕 Создание начального списка игроков...');
       players = [
         { username: "atemmax", balance: 660 },
         { username: "loloky", balance: 76 },
@@ -41,22 +90,63 @@ function loadPlayers() {
         { username: "chessmaster", balance: 200 },
         { username: "grandpaw", balance: 1800 }
       ];
-      savePlayers();
-      console.log('✅ Создан players.json');
+      await savePlayers(); // Сохраняем в первый раз
+      console.log('✅ Создан начальный players.json');
     }
   } catch (err) {
-    console.error('❌ Ошибка загрузки:', err);
-    players = [];
+    console.error('❌ Критическая ошибка загрузки данных:', err);
+    players = []; // fallback
   }
 }
 
-// === Сохранение в файл ===
-function savePlayers() {
+// === Сохранение в файл (и в GitHub, если настроено) ===
+async function savePlayers() {
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(players, null, 2), 'utf8');
-    console.log('💾 Данные сохранены');
+    const jsonData = JSON.stringify(players, null, 2);
+    
+    // 1. Всегда сохраняем локально
+    fs.writeFileSync(DATA_FILE, jsonData, 'utf8');
+    console.log('💾 Данные сохранены локально');
+
+    // 2. Если настроено, сохраняем в GitHub
+    if (GITHUB_TOKEN && GITHUB_REPO) {
+      const contentBase64 = Buffer.from(jsonData).toString('base64');
+      
+      // Определяем сообщение коммита
+      const playerCount = players.length;
+      const totalBalance = players.reduce((sum, p) => sum + p.balance, 0);
+      const commitMessage = `Update players.json: ${playerCount} players, total ${totalBalance} usov`;
+
+      const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+      
+      const data = {
+        message: commitMessage,
+        content: contentBase64,
+        branch: GITHUB_BRANCH
+      };
+
+      // Если файл уже существовал, нужно указать его SHA для обновления
+      if (githubFileSha) {
+        data.sha = githubFileSha;
+      }
+
+      try {
+        const response = await axios.put(url, data, {
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github.v3+json',
+          }
+        });
+        
+        githubFileSha = response.data.content.sha; // Обновляем SHA
+        console.log(`☁️ Данные сохранены в GitHub (новый SHA: ${githubFileSha.substring(0, 7)})`);
+      } catch (githubErr) {
+        console.error('❌ Ошибка сохранения в GitHub:', githubErr.response?.data || githubErr.message);
+        // Не прерываем основной поток, если GitHub не отвечает
+      }
+    }
   } catch (err) {
-    console.error('❌ Ошибка сохранения:', err);
+    console.error('❌ Критическая ошибка сохранения данных:', err);
   }
 }
 
@@ -78,7 +168,9 @@ function getRank(balance) {
 }
 
 // === Загружаем при старте ===
-loadPlayers();
+loadPlayers().then(() => {
+  console.log("🏁 Инициализация завершена. Бот готов.");
+});
 
 // === Команда: /bal username ===
 bot.onText(/\/bal\s+(\w+)/, (msg, match) => {
@@ -150,7 +242,7 @@ bot.onText(/\/json\s+edit([\s\S]*)/, (msg, match) => {
     }
 
     players = newPlayers;
-    savePlayers();
+    savePlayers(); // Используем асинхронную версию
     bot.sendMessage(chatId, `✅ JSON обновлён. Игроков: ${players.length}`);
   } catch (err) {
     bot.sendMessage(chatId, `❌ Ошибка парсинга JSON:\n${err.message}`);
@@ -171,7 +263,7 @@ bot.onText(/\/nule/i, (msg) => {
 
   const count = players.length;
   players.forEach(p => p.balance = 0);
-  savePlayers();
+  savePlayers(); // Используем асинхронную версию
 
   bot.sendMessage(chatId, `✅ Балансы всех ${count} игроков обнулены.`);
 });
@@ -261,7 +353,7 @@ bot.on('message', (msg) => {
       bot.sendMessage(chatId, msgText);
     }
 
-    savePlayers(); // Сохраняем после каждого изменения
+    savePlayers(); // Используем асинхронную версию
   }
 });
 
