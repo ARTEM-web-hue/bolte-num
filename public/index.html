@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Таблица игроков</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    }
+    table {
+      width: 90%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      font-size: 1.1em;
+    }
+    td {
+      padding: 12px 15px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    tr:nth-child(even) td {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .rank {
+      font-weight: bold;
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .wood { background: #8B4513; color: white; }
+    .metal { background: #A9A9A9; color: black; }
+    .bronze { background: #CD7F32; color: white; }
+    .silver { background: #C0C0C0; color: black; }
+    .gold { background: #FFD700; color: black; }
+  </style>
+</head>
+<body>
+  <h1>🏆 Таблица игроков по усам</h1>
+  <table id="playersTable">
+    <thead>
+      <tr>
+        <th>Звание</th>
+        <th>Игрок</th>
+        <th>Валюта</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const ranks = [
+      { min: 1500, name: "Золотое", class: "gold", icon: "👑" },
+      { min: 1000, name: "Серебряное", class: "silver", icon: "⭐" },
+      { min: 500, name: "Бронзовое", class: "bronze", icon: "🥉" },
+      { min: 250, name: "Металлическое", class: "metal", icon: "⚙️" },
+      { min: 100, name: "Деревянное", class: "wood", icon: "🌱" },
+      { min: 0, name: "Новичок", class: "wood", icon: "🐣" }
+    ];
+
+    function getRank(balance) {
+      for (let r of ranks) {
+        if (balance >= r.min) return r;
+      }
+      return ranks[ranks.length - 1];
+    }
+
+    async function loadPlayers() {
+      try {
+        const res = await fetch('/api/players');
+        const players = await res.json();
+        const tbody = document.querySelector("#playersTable tbody");
+        tbody.innerHTML = "";
+
+        players.sort((a, b) => b.balance - a.balance).forEach(p => {
+          const rank = getRank(p.balance);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><span class="rank ${rank.class}">${rank.icon} ${rank.name}</span></td>
+            <td>${p.username}</td>
+            <td>${p.balance} усов</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("Ошибка загрузки:", err);
+      }
+    }
+
+    setInterval(loadPlayers, 10000);
+    loadPlayers();
+  </script>
+</body>
+</html>
