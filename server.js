@@ -15,7 +15,7 @@ const ADMIN_IDS = (process.env.ADMIN_IDS || process.env.ADMIN_ID || '')
   .filter(Boolean);
 
 if (!TOKEN) throw new Error('Установите TELEGRAM_TOKEN');
-if (!ADMIN_ID) console.warn('⚠️ Не установлен ADMIN_ID — команды /nule и /com будут доступны всем');
+if (!ADMIN_IDS) console.warn('⚠️ Не установлен ADMIN_ID — команды /nule и /com будут доступны всем');
 
 const bot = new TelegramBot(TOKEN, { polling: true });
 
@@ -102,7 +102,7 @@ bot.onText(/\/json\s+view/i, (msg) => {
 const userId = String(msg.from.id);
 const isAdmin = ADMIN_IDS.includes(userId);
 
-  if (!isAdmin && ADMIN_ID) {
+  if (!isAdmin && ADMIN_IDS) {
     bot.sendMessage(chatId, '❌ Доступ запрещён.');
     return;
   }
@@ -122,9 +122,9 @@ const isAdmin = ADMIN_IDS.includes(userId);
 // === Команда: /json edit ===
 bot.onText(/\/json\s+edit([\s\S]*)/, (msg, match) => {
   const chatId = msg.chat.id;
-  const isAdmin = String(msg.from.id) === ADMIN_ID;
+  const isAdmin = String(msg.from.id) === ADMIN_IDS;
 
-  if (!isAdmin && ADMIN_ID) {
+  if (!isAdmin && ADMIN_IDS) {
     bot.sendMessage(chatId, '❌ Только админ может редактировать JSON.');
     return;
   }
@@ -154,9 +154,9 @@ bot.onText(/\/json\s+edit([\s\S]*)/, (msg, match) => {
 // === НОВАЯ КОМАНДА: /nule ===
 bot.onText(/\/nule/i, (msg) => {
   const chatId = msg.chat.id;
-  const isAdmin = String(msg.from.id) === ADMIN_ID;
+  const isAdmin = String(msg.from.id) === ADMIN_IDS;
 
-  if (!isAdmin && ADMIN_ID) {
+  if (!isAdmin && ADMIN_IDS) {
     bot.sendMessage(chatId, '❌ Только админ может обнулить балансы.');
     return;
   }
@@ -171,7 +171,7 @@ bot.onText(/\/nule/i, (msg) => {
 // === НОВАЯ КОМАНДА: /com ===
 bot.onText(/\/com/i, (msg) => {
   const chatId = msg.chat.id;
-  const isAdmin = String(msg.from.id) === ADMIN_ID;
+  const isAdmin = String(msg.from.id) === ADMIN_IDS;
 
   let helpText = `
 🎮 <b>Команды бота:</b>
@@ -183,7 +183,7 @@ bot.onText(/\/com/i, (msg) => {
    Посмотреть баланс игрока
 `;
 
-  if (isAdmin || !ADMIN_ID) {
+  if (isAdmin || !ADMIN_IDS) {
     helpText += `
 🔐 <b>Админские команды:</b>
 
@@ -211,9 +211,9 @@ bot.on('message', (msg) => {
   const text = msg.text?.trim();
 
   // === Проверка на админа (если ADMIN_ID задан) ===
-  const isAdmin = userId === ADMIN_ID;
+  const isAdmin = userId === ADMIN_IDS;
   if (text?.startsWith('Update balance lichess ')) {
-    if (ADMIN_ID && !isAdmin) {
+    if (ADMIN_IDS && !isAdmin) {
       bot.sendMessage(chatId, '❌ Обновлять баланс может только администратор.');
       return;
     }
@@ -346,11 +346,11 @@ app.get('/info', (req, res) => {
       <a href="https://lichess.org/team/NW5eTSTC">NW5eTSTC</a>
     </p>
     <p>
-      1 клуб: <a href="https://lichess.org/team/2Jic5G62">2Jic5G62</a><br>
-      вот 2: <a href="https://lichess.org/team/r2jBMkqQ">r2jBMkqQ</a><br>
-      вот 3: <a href="https://lichess.org/team/EQeKftyd">EQeKftyd</a><br>
-      вот 4 он жив!: <a href="https://lichess.org/team/fAEHcVRb">fAEHcVRb</a><br>
-      вот 5: <a href="https://lichess.org/team/3WtxMOsQ">3WtxMOsQ</a>
+      1 клуб: <a href="https://lichess.org/team/NW5eTSTC">2Jic5G62</a><br>
+      вот 2: <a href="https://lichess.org/team/2Jic5G62">r2jBMkqQ</a><br>
+      вот 3: <a href="https://lichess.org/team/r2jBMkqQ">EQeKftyd</a><br>
+      вот 4 он жив!: <a href="https://lichess.org/team/EQeKftyd">fAEHcVRb</a><br>
+      вот 5: <a href="https://lichess.org/team/fAEHcVRb">3WtxMOsQ</a>
     </p>
     <p>
       И остался наш клуб — 6 версия, но был еще один клуб, в котором я сохранил описание нашего 1 ссу.
