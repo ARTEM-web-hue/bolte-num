@@ -11,7 +11,7 @@ const TOKEN = process.env.TELEGRAM_TOKEN;
 const ADMIN_ID = process.env.ADMIN_ID; // Ваш Telegram ID
 
 if (!TOKEN) throw new Error('Установите TELEGRAM_TOKEN');
-if (!ADMIN_ID) console.warn('⚠️ Не установлен ADMIN_ID — /json edit будет доступен всем');
+if (!ADMIN_ID) console.warn('⚠️ Не установлен ADMIN_ID — команды /nule и /com будут доступны всем');
 
 const bot = new TelegramBot(TOKEN, { polling: true });
 
@@ -144,6 +144,59 @@ bot.onText(/\/json\s+edit([\s\S]*)/, (msg, match) => {
   } catch (err) {
     bot.sendMessage(chatId, `❌ Ошибка парсинга JSON:\n${err.message}`);
   }
+});
+
+// === НОВАЯ КОМАНДА: /nule ===
+bot.onText(/\/nule/i, (msg) => {
+  const chatId = msg.chat.id;
+  const isAdmin = String(msg.from.id) === ADMIN_ID;
+
+  if (!isAdmin && ADMIN_ID) {
+    bot.sendMessage(chatId, '❌ Только админ может обнулить балансы.');
+    return;
+  }
+
+  const count = players.length;
+  players.forEach(p => p.balance = 0);
+  savePlayers();
+
+  bot.sendMessage(chatId, `✅ Балансы всех ${count} игроков обнулены.`);
+});
+
+// === НОВАЯ КОМАНДА: /com ===
+bot.onText(/\/com/i, (msg) => {
+  const chatId = msg.chat.id;
+  const isAdmin = String(msg.from.id) === ADMIN_ID;
+
+  let helpText = `
+🎮 <b>Команды бота:</b>
+
+🔹 <code>Update balance lichess ник +100</code>
+   Обновить баланс игрока
+
+🔹 <code>/bal ник</code>
+   Посмотреть баланс игрока
+`;
+
+  if (isAdmin || !ADMIN_ID) {
+    helpText += `
+🔐 <b>Админские команды:</b>
+
+🔹 <code>/json view</code>
+   Посмотреть JSON данных
+
+🔹 <code>/json edit [...]</code>
+   Заменить всех игроков
+
+🔹 <code>/nule</code>
+   Обнулить балансы всех игроков
+
+🔹 <code>/com</code>
+   Показать эту справку
+`;
+  }
+
+  bot.sendMessage(chatId, helpText, { parse_mode: 'HTML' });
 });
 
 // === Обработка Update balance ===
