@@ -202,9 +202,17 @@ bot.onText(/\/com/i, (msg) => {
 // === Обработка Update balance ===
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
+  const userId = String(msg.from.id);
   const text = msg.text?.trim();
 
+  // === Проверка на админа (если ADMIN_ID задан) ===
+  const isAdmin = userId === ADMIN_ID;
   if (text?.startsWith('Update balance lichess ')) {
+    if (ADMIN_ID && !isAdmin) {
+      bot.sendMessage(chatId, '❌ Обновлять баланс может только администратор.');
+      return;
+    }
+
     const regex = /^Update balance lichess (\w+) ([+\-]?\d+)$/;
     const match = text.match(regex);
 
