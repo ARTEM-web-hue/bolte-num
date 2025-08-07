@@ -34,8 +34,7 @@ async function loadPlayers() {
       // Ищем все числа: +100, -50, 20
       const numbers = numbersPart.match(/[+\-]?\d+/g) || [];
       const balance = numbers.reduce((sum, num) => sum + parseInt(num, 10), 0);
-
-      playersMap[username] = { username, balance };
+      playersMap[username] = { username, balance, trophies: [] };
     });
 
     players = Object.values(playersMap);
