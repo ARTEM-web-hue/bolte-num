@@ -13,45 +13,62 @@ let players = [];
 // Функция загрузки и парсинга данных
 async function loadPlayers() {
   try {
-    const [voltRes, nagradRes] = await Promise.all([
-      axios.get(VOLT_URL).catch(() => ({ data: '' })),
-      axios.get(NAGRAD_URL).catch(() => ({ data: '' }))
-    ]);
+    // === 1. Загружаем volt.txt с GitHub ===
+    if (GITHUB_TOKEN && GITHUB_REPO) {
+      const voltUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/volt.txt`;
+      console.log('🔄 Попытка загрузки volt.txt с GitHub...');
+      try {
+        const response = await axios.get(voltUrl);
+        const lines = response.data.split('\n');
+        const playersMap = {};
 
-    const voltLines = voltRes.data.split('\n');
-    const nagradLines = nagradRes.data.split('\n');
+        lines.forEach(line => {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.includes(':')) return;
 
-    const playersMap = {};
+          const [usernamePart, numbersPart] = trimmed.split(':');
+          const username = usernamePart.trim();
+          if (!username) return;
 
-    // Парсим volt.txt: суммируем все числа
-    voltLines.forEach(line => {
-      const match = line.trim().match(/^(\w+):\s*(.+)$/);
-      if (match) {
-        const username = match[1];
-        const numbers = match[2].match(/[+\-]?\d+/g) || [];
-        const balance = numbers.reduce((sum, num) => sum + parseInt(num), 0);
-        playersMap[username] = { username, balance, trophies: [] };
-      }
-    });
+          // Ищем все числа с плюсом/минусом
+          const numbers = numbersPart.match(/[+\-]?\d+/g) || [];
+          const balance = numbers.reduce((sum, num) => sum + parseInt(num, 10), 0);
 
-    // Парсим nagrad.txt: добавляем трофеи
-    nagradLines.forEach(line => {
-      const match = line.trim().match(/^(\w+):\s*(.+)$/);
-      if (match) {
-        const username = match[1];
-        const trophies = match[2].trim().split(/\s+/).filter(t => t);
-        if (playersMap[username]) {
-          playersMap[username].trophies = trophies;
-        } else if (trophies.length > 0) {
-          playersMap[username] = { username, balance: 0, trophies };
+          playersMap[username] = { username, balance };
+        });
+
+        players = Object.values(playersMap);
+        console.log(`✅ Загружено ${players.length} игроков из volt.txt`);
+        return; // Успешно загрузили — выходим
+      } catch (err) {
+        if (err.response?.status === 404) {
+          console.log('❌ volt.txt не найден на GitHub');
+        } else {
+          console.error('❌ Ошибка загрузки volt.txt:', err.message);
         }
       }
-    });
+    }
 
-    players = Object.values(playersMap);
-    console.log(`✅ Загружено ${players.length} игроков`);
+    // === 2. Если не получилось — пробуем локальный players.json ===
+    if (fs.existsSync(DATA_FILE)) {
+      console.log('🔄 Загрузка players.json с локального диска...');
+      const data = fs.readFileSync(DATA_FILE, 'utf8');
+      players = JSON.parse(data);
+      console.log(`✅ Загружено ${players.length} игроков из локального players.json`);
+      return;
+    }
+
+    // === 3. Если ничего нет — начальные данные ===
+    console.log('🆕 Создание начальных данных...');
+    players = [
+      { username: "atemmax", balance: 660 },
+      { username: "loloky", balance: 76 },
+      { username: "hentera", balance: 1200 }
+    ];
+    await savePlayers();
+    console.log('✅ Начальные данные созданы');
   } catch (err) {
-    console.error('❌ Ошибка загрузки данных:', err.message);
+    console.error('❌ Критическая ошибка загрузки:', err);
     players = []; // fallback
   }
 }
