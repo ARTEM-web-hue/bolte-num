@@ -18,12 +18,14 @@ let players = [];
 // === Загрузка данных из volt.txt ===
 async function loadPlayers() {
   try {
-    console.log('🔄 Загрузка данных из volt.txt...');
-    const response = await axios.get(VOLT_URL + '?t=' + Date.now()); // Без кеша
-    const lines = response.data.split('\n');
+    console.log('🔄 Загрузка данных из volt.txt и nagrad.txt...');
+
+    // --- 1. Загружаем volt.txt ---
+    const voltResponse = await axios.get(VOLT_URL + '?t=' + Date.now());
+    const voltLines = voltResponse.data.split('\n');
     const playersMap = {};
 
-    lines.forEach(line => {
+    voltLines.forEach(line => {
       const trimmed = line.trim();
       if (!trimmed || !trimmed.includes(':')) return;
 
@@ -31,43 +33,65 @@ async function loadPlayers() {
       const username = usernamePart.trim();
       if (!username) return;
 
-      // Ищем все числа: +100, -50, 20
       const numbers = numbersPart.match(/[+\-]?\d+/g) || [];
       const balance = numbers.reduce((sum, num) => sum + parseInt(num, 10), 0);
+
+      // Инициализируем игрока с пустым массивом трофеев
       playersMap[username] = { username, balance, trophies: [] };
     });
 
+    // --- 2. Загружаем nagrad.txt ---
+    try {
+      const nagradResponse = await axios.get(NAGRAD_URL + '?t=' + Date.now());
+      const nagradLines = nagradResponse.data.split('\n');
+
+      nagradLines.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.includes(':')) return;
+
+        const [usernamePart, trophiesPart] = trimmed.split(':');
+        const username = usernamePart.trim();
+        if (!username) return;
+
+        const trophies = trophiesPart.trim().split(/\s+/).filter(t => t);
+
+        if (playersMap[username]) {
+          playersMap[username].trophies = trophies;
+        } else {
+          // Если игрока нет в volt.txt — создаём с нулевым балансом
+          playersMap[username] = { username, balance: 0, trophies };
+        }
+      });
+    } catch (err) {
+      console.warn('⚠️ Не удалось загрузить nagrad.txt:', err.message);
+    }
+
     players = Object.values(playersMap);
-    console.log(`✅ Загружено ${players.length} игроков из volt.txt`);
+    console.log(`✅ Загружено ${players.length} игроков (${players.filter(p => p.trophies.length > 0).length} с трофеями)`);
 
-    // 🔁 Сохраняем локально (для резерва или отладки)
+    // Сохраняем локально
     fs.writeFileSync(DATA_FILE, JSON.stringify(players, null, 2), 'utf8');
-    console.log('💾 Данные сохранены локально в players.json');
+    console.log('💾 Данные сохранены в players.json');
   } catch (err) {
-    console.error('❌ Ошибка загрузки volt.txt:', err.message);
-
-    // Если GitHub не отвечает — загружаем из локального файла
+    console.error('❌ Ошибка загрузки данных:', err.message);
+    // fallback — попробуем локальный файл
     if (fs.existsSync(DATA_FILE)) {
-      console.log('🔄 Загрузка резервной копии из players.json');
       try {
         const data = fs.readFileSync(DATA_FILE, 'utf8');
         players = JSON.parse(data);
         console.log(`✅ Загружено ${players.length} игроков из резерва`);
       } catch (e) {
         console.error('❌ Ошибка чтения players.json:', e);
-        players = []; // фолбэк
+        players = [];
       }
     } else {
-      console.log('🆕 Нет данных. Используем начальные...');
       players = [
-        { username: "atemmax", balance: 660 },
-        { username: "loloky", balance: 76 },
-        { username: "hentera", balance: 1200 }
+        { username: "atemmax", balance: 0, trophies: ["Медаль создателя сайта"] },
+        { username: "Rondom12345678", balance: 0, trophies: ["Медаль создателя клуба"] }
       ];
     }
   }
 }
-
 // === Автообновление каждые 5 минут ===
 setInterval(loadPlayers, 5 * 60 * 1000);
 
