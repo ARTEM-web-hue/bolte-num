@@ -1,82 +1,75 @@
-// server.js
+// serv.js — ПРОСТОЙ И ПРАВИЛЬНЫЙ
 const express = require('express');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// 🔗 Ссылки на файлы в твоём репозитории (RAW!)
+// 🔗 Прямые ссылки на RAW-файлы в GitHub
 const VOLT_URL = 'https://raw.githubusercontent.com/ARTEM-web-hue/bolte-num/main/volt.txt';
 const NAGRAD_URL = 'https://raw.githubusercontent.com/ARTEM-web-hue/bolte-num/main/nagrad.txt';
 
+// Локальный файл для резерва (опционально)
+const DATA_FILE = path.join(__dirname, 'players.json');
+
 let players = [];
 
-// Функция загрузки и парсинга данных
+// === Загрузка данных из volt.txt ===
 async function loadPlayers() {
   try {
-    // === 1. Загружаем volt.txt с GitHub ===
-    if (GITHUB_TOKEN && GITHUB_REPO) {
-      const voltUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/volt.txt`;
-      console.log('🔄 Попытка загрузки volt.txt с GitHub...');
-      try {
-        const response = await axios.get(voltUrl);
-        const lines = response.data.split('\n');
-        const playersMap = {};
+    console.log('🔄 Загрузка данных из volt.txt...');
+    const response = await axios.get(VOLT_URL + '?t=' + Date.now()); // Без кеша
+    const lines = response.data.split('\n');
+    const playersMap = {};
 
-        lines.forEach(line => {
-          const trimmed = line.trim();
-          if (!trimmed || !trimmed.includes(':')) return;
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed || !trimmed.includes(':')) return;
 
-          const [usernamePart, numbersPart] = trimmed.split(':');
-          const username = usernamePart.trim();
-          if (!username) return;
+      const [usernamePart, numbersPart] = trimmed.split(':');
+      const username = usernamePart.trim();
+      if (!username) return;
 
-          // Ищем все числа с плюсом/минусом
-          const numbers = numbersPart.match(/[+\-]?\d+/g) || [];
-          const balance = numbers.reduce((sum, num) => sum + parseInt(num, 10), 0);
+      // Ищем все числа: +100, -50, 20
+      const numbers = numbersPart.match(/[+\-]?\d+/g) || [];
+      const balance = numbers.reduce((sum, num) => sum + parseInt(num, 10), 0);
 
-          playersMap[username] = { username, balance };
-        });
+      playersMap[username] = { username, balance };
+    });
 
-        players = Object.values(playersMap);
-        console.log(`✅ Загружено ${players.length} игроков из volt.txt`);
-        return; // Успешно загрузили — выходим
-      } catch (err) {
-        if (err.response?.status === 404) {
-          console.log('❌ volt.txt не найден на GitHub');
-        } else {
-          console.error('❌ Ошибка загрузки volt.txt:', err.message);
-        }
-      }
-    }
+    players = Object.values(playersMap);
+    console.log(`✅ Загружено ${players.length} игроков из volt.txt`);
 
-    // === 2. Если не получилось — пробуем локальный players.json ===
-    if (fs.existsSync(DATA_FILE)) {
-      console.log('🔄 Загрузка players.json с локального диска...');
-      const data = fs.readFileSync(DATA_FILE, 'utf8');
-      players = JSON.parse(data);
-      console.log(`✅ Загружено ${players.length} игроков из локального players.json`);
-      return;
-    }
-
-    // === 3. Если ничего нет — начальные данные ===
-    console.log('🆕 Создание начальных данных...');
-    players = [
-      { username: "atemmax", balance: 660 },
-      { username: "loloky", balance: 76 },
-      { username: "hentera", balance: 1200 }
-    ];
-    await savePlayers();
-    console.log('✅ Начальные данные созданы');
+    // 🔁 Сохраняем локально (для резерва или отладки)
+    fs.writeFileSync(DATA_FILE, JSON.stringify(players, null, 2), 'utf8');
+    console.log('💾 Данные сохранены локально в players.json');
   } catch (err) {
-    console.error('❌ Критическая ошибка загрузки:', err);
-    players = []; // fallback
+    console.error('❌ Ошибка загрузки volt.txt:', err.message);
+
+    // Если GitHub не отвечает — загружаем из локального файла
+    if (fs.existsSync(DATA_FILE)) {
+      console.log('🔄 Загрузка резервной копии из players.json');
+      try {
+        const data = fs.readFileSync(DATA_FILE, 'utf8');
+        players = JSON.parse(data);
+        console.log(`✅ Загружено ${players.length} игроков из резерва`);
+      } catch (e) {
+        console.error('❌ Ошибка чтения players.json:', e);
+        players = []; // фолбэк
+      }
+    } else {
+      console.log('🆕 Нет данных. Используем начальные...');
+      players = [
+        { username: "atemmax", balance: 660 },
+        { username: "loloky", balance: 76 },
+        { username: "hentera", balance: 1200 }
+      ];
+    }
   }
 }
 
-// Первая загрузка
-loadPlayers();
-
-// Обновление каждые 5 минут
+// === Автообновление каждые 5 минут ===
 setInterval(loadPlayers, 5 * 60 * 1000);
 
 // === API для сайта ===
@@ -87,7 +80,7 @@ app.get('/api/players', (req, res) => {
 // === Статика: index.html, /info и т.д. ===
 app.use(express.static('public'));
 
-// === /info — уже знаешь ===
+// === /info — как у тебя ===
 app.get('/info', (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -139,6 +132,10 @@ app.get('/info', (req, res) => {
   `);
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Сервер запущен на порту ${PORT}`);
+// === Запуск ===
+loadPlayers().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Сервер запущен на порту ${PORT}`);
+    console.log(`📊 Игроков: ${players.length}`);
+  });
 });
