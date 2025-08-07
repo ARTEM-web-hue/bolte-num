@@ -7,8 +7,8 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // 🔗 Прямые ссылки на RAW-файлы в GitHub
-const VOLT_URL = 'https://raw.githubusercontent.com/ARTEM-web-hue/bolte-num/main/volt.txt';
-const NAGRAD_URL = 'https://raw.githubusercontent.com/ARTEM-web-hue/bolte-num/main/nagrad.txt';
+const VOLT_URL = 'https://raw.githubusercontent.com/ARTEM-web-hue/bolte-num/version-two/volt.txt';
+const NAGRAD_URL = 'https://raw.githubusercontent.com/ARTEM-web-hue/bolte-num/version-two/nagrad.txt';
 
 // Локальный файл для резерва (опционально)
 const DATA_FILE = path.join(__dirname, 'players.json');
