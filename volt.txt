@@ -11,7 +11,7 @@ YaDeni: +35
 Legendary_Account: +12
 ks_WERE12: +4
 LegendOfKazan: +10
-Sasha_karatist: +377 +62 +44 +117 +63 +20 +100 +30
+Sasha_karatist: +377 +62 +44 +117 +63 +20 +100 +30 +50
 Takt1k: +30
 Ferxs12: +164
 TB-OFICIALL-ACCOUNT: +173
@@ -26,7 +26,7 @@ BartChess08: +33
 Shooting_star001: +33
 chesskitten14: +18
 Keymat_111: +12
-atemmax: +234 + 53
+atemmax: +234 + 53 -100
 lovushka777: +77
 iuliania01: +60
 dima_molodec: +22
@@ -36,7 +36,7 @@ matveivoronin: +3
 sasha0: +222
 gepard2014: +58 +6
 QuantumPancake52: +178
-Margarita_2017: +2 +30
+Margarita_2017: +2 +30 +50
 retef123: +15
 top_igrok_best: +10
 GroccMecteR1: +2
