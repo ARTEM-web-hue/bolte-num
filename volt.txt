@@ -1,7 +1,7 @@
 LLlAXMATbl1: +29
 Breshko_Savva: +155
 ChampionOfRussia: +11
-Rondom12345678: +642 +45 +48 +1
+Rondom12345678: +642 +45 +48 +1 +11
 sasha04rus: +19 +134
 AlexanderTs: +5
 Sofk: +3
@@ -11,14 +11,14 @@ YaDeni: +35
 Legendary_Account: +12
 ks_WERE12: +4
 LegendOfKazan: +10
-Sasha_karatist: +377 +62 +44 +117
+Sasha_karatist: +377 +62 +44 +117 +63
 Takt1k: +30
 Ferxs12: +164
 TB-OFICIALL-ACCOUNT: +173
 Popsik_Flipflopsik36: +318
 Timur_Guriev_chess: +9
 Feodor_Koltsov: +6
-telepat1: +72
+telepat1: +72 +13
 hUmAn_111: +66
 Tennisplay: +35
 ChessDragon1907: +34
@@ -40,3 +40,5 @@ Margarita_2017: +2
 retef123: +15
 top_igrok_best: +10
 GroccMecteR1: +2
+Ficheal: +18
+
