@@ -1,8 +1,8 @@
 LLlAXMATbl1: +29
 Breshko_Savva: +155
 ChampionOfRussia: +11
-Rondom12345678: +642 +45
-sasha04rus: +19
+Rondom12345678: +642 +45 +48
+sasha04rus: +19 +134
 AlexanderTs: +5
 Sofk: +3
 YusifPanahov: +54
@@ -11,7 +11,7 @@ YaDeni: +35
 Legendary_Account: +12
 ks_WERE12: +4
 LegendOfKazan: +10
-Sasha_karatist: +377 +62 +44
+Sasha_karatist: +377 +62 +44 +117
 Takt1k: +30
 Ferxs12: +164
 TB-OFICIALL-ACCOUNT: +173
@@ -34,6 +34,9 @@ erhanmaster: +70
 chipi_chipi228: +0
 matveivoronin: +3
 sasha0: +222
-gepard2014: +58
+gepard2014: +58 +6
 QuantumPancake52: +178
 Margarita_2017: +2
+retef123: +15
+top_igrok_best: +10
+GroccMecteR1: +2
