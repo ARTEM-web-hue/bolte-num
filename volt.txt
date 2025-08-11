@@ -1,7 +1,7 @@
 LLlAXMATbl1: +29
 Breshko_Savva: +155
 ChampionOfRussia: +11
-Rondom12345678: +642 +45 +48 +1 +11 +110 +110 +23 +6
+Rondom12345678: +642 +45 +48 +1 +11 +110 +110 +23 +6 +40 +9
 sasha04rus: +19 +134 +117
 AlexanderTs: +5
 Sofk: +3
@@ -36,7 +36,7 @@ matveivoronin: +3
 sasha0: +222
 gepard2014: +58 +6
 QuantumPancake52: +178
-Margarita_2017: +2 +30 +50 +12 +60 +2
+Margarita_2017: +2 +30 +50 +12 +60 +2 +25 +3
 retef123: +15
 top_igrok_best: +10
 GroccMecteR1: +2
@@ -44,3 +44,4 @@ Ficheal: +18
 Ilya0510: +17
 MAKdalin: +10
 Mister204 +2
+Kira201: +20 +3
