@@ -1,21 +1,21 @@
 LLlAXMATbl1: +29
 Breshko_Savva: +155
 ChampionOfRussia: +11
-Rondom12345678: +642 +45 +48 +1 +11 +110 +110 +23 +6 +40 +9
+Rondom12345678: +642 +45 +48 +1 +11 +110 +110 +23 +6 +40 +9 +6
 sasha04rus: +19 +134 +117
 AlexanderTs: +5
 Sofk: +3
 YusifPanahov: +54
 maxvoitovich: +3
-YaDeni: +35
+YaDeni: +35 +4
 Legendary_Account: +12
 ks_WERE12: +4
 LegendOfKazan: +10
-Sasha_karatist: +377 +62 +44 +117 +63 +20 +100 +30 +50 +100 +91 +49
+Sasha_karatist: +377 +62 +44 +117 +63 +20 +100 +30 +50 +100 +91 +49 +2
 Takt1k: +30
 Ferxs12: +164
 TB-OFICIALL-ACCOUNT: +173
-Popsik_Flipflopsik36: +318
+Popsik_Flipflopsik36: +318 +8
 Timur_Guriev_chess: +9
 Feodor_Koltsov: +6
 telepat1: +72 +13
@@ -26,7 +26,7 @@ BartChess08: +33
 Shooting_star001: +33
 chesskitten14: +18
 Keymat_111: +12
-atemmax: +234 + 53 -100 -100 +109 +18
+atemmax: +234 + 53 -100 -100 +109 +18 +2
 lovushka777: +77
 iuliania01: +60
 dima_molodec: +22
@@ -34,7 +34,7 @@ erhanmaster: +70
 chipi_chipi228: +0
 matveivoronin: +3
 sasha0: +222
-gepard2014: +58 +6
+gepard2014: +58 +6 +2
 QuantumPancake52: +178
 Margarita_2017: +2 +30 +50 +12 +60 +2 +25 +3
 retef123: +15
