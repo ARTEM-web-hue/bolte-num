@@ -1,11 +1,11 @@
 LLlAXMATbl1: +29
-Breshko_Savva: +155
+Breshko_Savva: +155 +15
 ChampionOfRussia: +11
-Rondom12345678: +642 +45 +48 +1 +11 +110 +110 +23 +6 +40 +9 +6
+Rondom12345678: +642 +45 +48 +1 +11 +110 +110 +23 +6 +40 +9 +6 +8
 sasha04rus: +19 +134 +117
 AlexanderTs: +5
 Sofk: +3
-YusifPanahov: +54
+YusifPanahov: +54 +11
 maxvoitovich: +3
 YaDeni: +35 +4
 Legendary_Account: +12
@@ -26,7 +26,7 @@ BartChess08: +33
 Shooting_star001: +33
 chesskitten14: +18
 Keymat_111: +12
-atemmax: +234 + 53 -100 -100 +109 +18 +2 +25
+atemmax: +234 + 53 -100 -100 +109 +18 +2 +25 +14
 lovushka777: +77
 iuliania01: +60
 dima_molodec: +22
