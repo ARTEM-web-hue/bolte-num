@@ -14,7 +14,7 @@ LegendOfKazan: +10
 Sasha_karatist: +377 +62 +44 +117 +63 +20 +100 +30 +50 +100 +91 +49 +2 +30 +31
 Takt1k: +30
 Ferxs12: +164
-TB-OFICIALL-ACCOUNT: +173
+TB-OFICIALL-ACCOUNT: +173 -100
 Popsik_Flipflopsik36: +318 +8
 Timur_Guriev_chess: +9
 Feodor_Koltsov: +6
@@ -26,7 +26,7 @@ BartChess08: +33
 Shooting_star001: +33
 chesskitten14: +18
 Keymat_111: +12
-atemmax: +234 + 53 -100 -100 +109 +18 +2 +25 +14
+atemmax: +234 + 53 -100 -100 +109 +18 +2 +25 +14 +100
 lovushka777: +77
 iuliania01: +60
 dima_molodec: +22
