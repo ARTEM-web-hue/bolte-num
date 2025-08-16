@@ -43,25 +43,25 @@ GroccMecteR1: +2
 Ficheal: +18
 Ilya0510: +17
 MAKdalin: +10 +13
-Mister204 +2
+Mister204: +2
 Kira201: +20 +3
-Dima2005_Fan_Admin +8
-FishIsBack +9 +3 +3
-KOtEnok456 +8 +28
-MooNArtik +2
-KAZAMBA +4 +16 +2
-Levandovckii +8
-Raichu_Attack +2
-SiSi5i +30
-Artur_Logvinyuk12 +9
-nikola_y_s +8
-Ivan_Meshtrovich +4
-DIMAStup +2
-DolphinKits +1
-Kseniya_Rolya +2
-Master_Chess70 +90
-MaksBest2005 +5
-SaNek_EnOt +73
-LevPozhiratel +44
-ChistyakovStepan +24
-EwwanQ +3
+Dima2005_Fan_Admin: +8
+FishIsBack: +9 +3 +3
+KOtEnok456: +8 +28
+MooNArtik: +2
+KAZAMBA: +4 +16 +2
+Levandovckii: +8
+Raichu_Attack: +2
+SiSi5i: +30
+Artur_Logvinyuk12: +9
+nikola_y_s: +8
+Ivan_Meshtrovich: +4
+DIMAStup: +2
+DolphinKits: +1
+Kseniya_Rolya: +2
+Master_Chess70: +90
+MaksBest2005: +5
+SaNek_EnOt: +73
+LevPozhiratel: +44
+ChistyakovStepan: +24
+EwwanQ: +3
