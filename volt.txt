@@ -1,7 +1,7 @@
 LLlAXMATbl1: +29
 Breshko_Savva: +155 +15 +27
 ChampionOfRussia: +11
-Rondom12345678: +642 +45 +48 +1 +11 +110 +110 +23 +6 +40 +9 +6 +8 +25 +6 +2 +200 +9
+Rondom12345678: +642 +45 +48 +1 +11 +110 +110 +23 +6 +40 +9 +6 +8 +25 +6 +2 +200 +9 +2
 sasha04rus: +19 +134 +117 +4
 AlexanderTs: +5
 Sofk: +3 +8
@@ -65,3 +65,4 @@ SaNek_EnOt: +73
 LevPozhiratel: +44
 ChistyakovStepan: +24
 EwwanQ: +3
+KOtEnok456:
